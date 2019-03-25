@@ -29,27 +29,24 @@ func (s *sub) process(w io.Writer, r io.Reader) error {
 		return err
 	}
 
-	rep := []byte(s.rep)
-	regSrc := s.reg
-	if !s.global {
-		regSrc = fmt.Sprintf("(?m)^(?P<before>.*?)%s(?P<after>.*)$", regSrc)
-
-		remapped := strings.NewReplacer(
-			// hack
-			"$4", "$5",
-			"$3", "$4",
-			"$2", "$3",
-			"$1", "$2",
-		).Replace(s.rep)
-		rep = []byte(fmt.Sprintf("${before}%s${after}", remapped))
-	}
-
-	reg, err := regexp.Compile(regSrc)
+	reg, err := regexp.Compile(s.reg)
 	if err != nil {
 		return err
 	}
 
-	res := reg.ReplaceAll(src, rep)
+	rep := []byte(s.rep)
+
+	var res []byte
+	if s.global {
+		res = reg.ReplaceAll(src, rep)
+	} else {
+		match := reg.FindSubmatchIndex(src)
+		dst := reg.Expand(nil, rep, src, match)
+
+		res = append(res, src[:match[0]]...)
+		res = append(res, dst...)
+		res = append(res, src[match[1]:]...)
+	}
 	_, err = w.Write(res)
 	return err
 }

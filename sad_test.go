@@ -40,7 +40,7 @@ func TestRun(t *testing.T) {
 		{
 			input:  "foo\nbar\nfoo\nbar",
 			cmd:    `s/foo/FOO/`,
-			output: "FOO\nbar\nFOO\nbar",
+			output: "FOO\nbar\nfoo\nbar",
 		},
 		{
 			input:  "foo\nbar\nfoo\nbar\n",
@@ -50,7 +50,7 @@ func TestRun(t *testing.T) {
 		{
 			input:  "foo\nbar\nfoo\nbar\n",
 			cmd:    `s/foo\nbar/FOO/`,
-			output: "FOO\nFOO\n", // should be "FOO\nfoo\nbar\n"
+			output: "FOO\nfoo\nbar\n",
 		},
 	}
 
