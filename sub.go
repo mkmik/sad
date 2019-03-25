@@ -1,8 +1,6 @@
 package main
 
 import (
-	"io"
-	"io/ioutil"
 	"regexp"
 )
 
@@ -12,30 +10,25 @@ type sub struct {
 	global bool
 }
 
-func (s *sub) process(w io.Writer, r io.Reader) error {
-	src, err := ioutil.ReadAll(r)
-	if err != nil {
-		return err
-	}
-
+func (s *sub) process(src []byte) ([]byte, error) {
 	reg, err := regexp.Compile(s.reg)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	rep := []byte(s.rep)
 
-	var res []byte
 	if s.global {
-		res = reg.ReplaceAll(src, rep)
-	} else {
-		match := reg.FindSubmatchIndex(src)
-		dst := reg.Expand(nil, rep, src, match)
-
-		res = append(res, src[:match[0]]...)
-		res = append(res, dst...)
-		res = append(res, src[match[1]:]...)
+		return reg.ReplaceAll(src, rep), nil
 	}
-	_, err = w.Write(res)
-	return err
+
+	match := reg.FindSubmatchIndex(src)
+	dst := reg.Expand(nil, rep, src, match)
+
+	var res []byte
+
+	res = append(res, src[:match[0]]...)
+	res = append(res, dst...)
+	res = append(res, src[match[1]:]...)
+	return res, nil
 }

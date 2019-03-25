@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"log"
 	"os"
 	"strings"
@@ -12,7 +13,7 @@ import (
 )
 
 type cmd interface {
-	process(w io.Writer, r io.Reader) error
+	process(src []byte) ([]byte, error)
 }
 
 func parse(src string) (cmd, error) {
@@ -50,7 +51,16 @@ func run(w io.Writer, r io.Reader, src string) error {
 		return err
 	}
 
-	return cmd.process(w, r)
+	all, err := ioutil.ReadAll(r)
+	if err != nil {
+		return err
+	}
+	b, err := cmd.process(all)
+	if err != nil {
+		return err
+	}
+	_, err = w.Write(b)
+	return err
 }
 
 func main() {
