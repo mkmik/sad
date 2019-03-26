@@ -126,6 +126,11 @@ func TestAddr(t *testing.T) {
 		sel   string
 	}{
 		{
+			input: "foo",
+			addr:  ``,
+			sel:   "foo",
+		},
+		{
 			input: "foo bar",
 			addr:  `/foo/`,
 			sel:   "foo",

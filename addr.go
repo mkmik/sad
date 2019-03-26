@@ -70,7 +70,16 @@ func (c *semicolon) address(body []byte, in dot) (dot, error) {
 	return dot{pr.low, ne.hi + utf8.RuneLen(runeAt(string(body), ne.hi))}, nil
 }
 
+type identity struct{}
+
+func (c *identity) address(body []byte, in dot) (dot, error) {
+	return in, nil
+}
+
 func parseAddr(addr string) (addresser, error) {
+	if addr == "" {
+		return &identity{}, nil
+	}
 	ch := addr[0]
 	rest := addr[1:]
 	switch {
