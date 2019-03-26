@@ -20,14 +20,16 @@ func parse(src string) (cmd, error) {
 	}
 	switch ch, del := src[0], src[1]; ch {
 	case 'a':
-		return &appe{until(src[2:], rune(del))}, nil
+		_, body := until(src[2:], rune(del))
+		return &appe{body}, nil
 	case 'i':
-		return &inse{until(src[2:], rune(del))}, nil
+		_, body := until(src[2:], rune(del))
+		return &inse{body}, nil
 	case 's':
-		reg := until(src[2:], rune(del))
-		rep := until(src[2+1+len(reg):], rune(del))
+		a, reg := until(src[2:], rune(del))
+		b, rep := until(src[2+1+a:], rune(del))
 		g := false
-		if i := 2 + 1 + len(reg) + 1 + len(rep); len(src) > i {
+		if i := 2 + 1 + len(reg) + 1 + b; len(src) > i {
 			g = src[i] == 'g'
 		}
 		return &sub{reg, rep, g}, nil
@@ -36,12 +38,15 @@ func parse(src string) (cmd, error) {
 	}
 }
 
-func until(src string, ch rune) string {
+// until scans src until it founds terminator ch
+// it returns the index of the terminator in the input sequence
+// and a possibly unescaped body.
+func until(src string, ch rune) (int, string) {
 	i := strings.IndexRune(src, ch)
 	if i == -1 {
-		return src
+		return len(src), src
 	}
-	return src[:i]
+	return i, src[:i]
 }
 
 func run(w io.Writer, r io.Reader, src string) error {

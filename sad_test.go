@@ -72,6 +72,12 @@ func TestRun(t *testing.T) {
 			cmd:    `d`,
 			output: "",
 		},
+		/*	{
+				input:  "f/o",
+				cmd:    `s/\//o/`,
+				output: "foo",
+			},
+		*/
 	}
 
 	for i, tc := range testCases {
