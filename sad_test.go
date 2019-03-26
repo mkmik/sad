@@ -72,12 +72,18 @@ func TestRun(t *testing.T) {
 			cmd:    `d`,
 			output: "",
 		},
-		/*	{
-				input:  "f/o",
-				cmd:    `s/\//o/`,
-				output: "foo",
-			},
-		*/
+		{
+			input:  "f/o",
+			cmd:    `s/\//o/`,
+			output: "foo",
+		},
+		{
+			// deviate from sam and align to modernity: only escape the delimiter
+			// and preserve all escape sequences supported by golang's regexp
+			input: "f/	o",
+			cmd:    `s;/\t;o;`,
+			output: "foo",
+		},
 	}
 
 	for i, tc := range testCases {

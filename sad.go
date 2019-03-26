@@ -42,11 +42,26 @@ func parse(src string) (cmd, error) {
 // it returns the index of the terminator in the input sequence
 // and a possibly unescaped body.
 func until(src string, ch rune) (int, string) {
-	i := strings.IndexRune(src, ch)
-	if i == -1 {
-		return len(src), src
+	esc := false
+	var res strings.Builder
+	for i, r := range src {
+		if r == '\\' {
+			esc = true
+		} else {
+			if r == ch {
+				if !esc {
+					return i, res.String()
+				}
+			}
+			if esc {
+				esc = false
+				res.WriteRune('\\')
+			}
+			res.WriteRune(r)
+		}
+
 	}
-	return i, src[:i]
+	return len(src), res.String()
 }
 
 func run(w io.Writer, r io.Reader, src string) error {
