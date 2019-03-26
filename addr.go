@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"regexp"
+	"unicode/utf8"
 )
 
 type dot struct {
@@ -50,6 +51,25 @@ func (c *comma) address(body []byte, in dot) (dot, error) {
 	return dot{pr.low, ne.hi}, nil
 }
 
+type semicolon struct {
+	prev addresser
+	next addresser
+}
+
+func (c *semicolon) address(body []byte, in dot) (dot, error) {
+	pr, err := c.prev.address(body, in)
+	if err != nil {
+		return in, err
+	}
+
+	ne, err := c.next.address(body, dot{pr.hi, pr.hi})
+	if err != nil {
+		return in, err
+	}
+
+	return dot{pr.low, ne.hi + utf8.RuneLen(runeAt(string(body), ne.hi))}, nil
+}
+
 func parseAddr(addr string) (addresser, error) {
 	ch := addr[0]
 	rest := addr[1:]
@@ -74,6 +94,13 @@ func continueAddr(addr string, prev addresser) (addresser, error) {
 			return nil, err
 		}
 		return &comma{prev, next}, nil
+	case ';':
+		next, err := parseAddr(addr[1:])
+		if err != nil {
+			return nil, err
+		}
+		return &semicolon{prev, next}, nil
+
 	default:
 		return prev, nil
 	}

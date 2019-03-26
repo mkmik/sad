@@ -135,6 +135,16 @@ func TestAddr(t *testing.T) {
 			addr:  `/f/,/b`,
 			sel:   "foo b",
 		},
+		{
+			input: "foo barf",
+			addr:  `/f/;/f`,
+			sel:   "foo barf",
+		},
+		{
+			input: "⌘oo bar⌘",
+			addr:  `/⌘/;/⌘`,
+			sel:   "⌘oo bar⌘",
+		},
 	}
 	for i, tc := range testCases {
 		t.Run(fmt.Sprint(i), func(t *testing.T) {
