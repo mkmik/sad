@@ -14,8 +14,9 @@ func parseCmd(src string) (cmd, error) {
 		return &del{}, nil
 	}
 
-	ch, term := src[0], runeAt(src, 1)
-	rest := src[1+utf8.RuneLen(term):]
+	ch := src[0]
+	term, lterm := utf8.DecodeRuneInString(src[1:])
+	rest := src[1+lterm:]
 
 	switch ch {
 	case 'a':

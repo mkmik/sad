@@ -5,12 +5,6 @@ import (
 	"unicode/utf8"
 )
 
-// runeAt returns the rune at byte index i.
-func runeAt(str string, i int) rune {
-	r, _ := utf8.DecodeRuneInString(str[i:])
-	return r
-}
-
 // until scans src until it founds terminator ch
 // it returns the length of the match in the input sequence, including the terminator.
 // It also returns a possibly unescaped body.

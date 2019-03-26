@@ -66,8 +66,8 @@ func (c *semicolon) address(body []byte, in dot) (dot, error) {
 	if err != nil {
 		return in, err
 	}
-
-	return dot{pr.low, ne.hi + utf8.RuneLen(runeAt(string(body), ne.hi))}, nil
+	_, n := utf8.DecodeRune(body[ne.hi:])
+	return dot{pr.low, ne.hi + n}, nil
 }
 
 type identity struct{}
