@@ -52,6 +52,11 @@ func TestRun(t *testing.T) {
 			cmd:    `s/foo\nbar/FOO/`,
 			output: "FOO\nfoo\nbar\n",
 		},
+		{
+			input:  "foo",
+			cmd:    `s/foo/bar`,
+			output: "bar",
+		},
 	}
 
 	for i, tc := range testCases {
