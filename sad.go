@@ -18,19 +18,19 @@ func parse(src string) (cmd, error) {
 	if src[0] == 'd' {
 		return &del{}, nil
 	}
-	switch ch, del := src[0], src[1]; ch {
+	switch ch, del, rest := src[0], src[1], src[2:]; ch {
 	case 'a':
-		_, body := until(src[2:], rune(del))
+		_, body := until(rest, rune(del))
 		return &appe{body}, nil
 	case 'i':
-		_, body := until(src[2:], rune(del))
+		_, body := until(rest, rune(del))
 		return &inse{body}, nil
 	case 's':
-		a, reg := until(src[2:], rune(del))
-		b, rep := until(src[2+1+a:], rune(del))
+		a, reg := until(rest, rune(del))
+		b, rep := until(rest[a:], rune(del))
 		g := false
-		if i := 2 + 1 + len(reg) + 1 + b; len(src) > i {
-			g = src[i] == 'g'
+		if i := a + b; len(rest) > i {
+			g = rest[i] == 'g'
 		}
 		return &sub{reg, rep, g}, nil
 	default:
@@ -39,8 +39,8 @@ func parse(src string) (cmd, error) {
 }
 
 // until scans src until it founds terminator ch
-// it returns the index of the terminator in the input sequence
-// and a possibly unescaped body.
+// it returns the length of the match in the input sequence, including the terminator.
+// It also returns a possibly unescaped body.
 func until(src string, ch rune) (int, string) {
 	esc := false
 	var res strings.Builder
@@ -50,7 +50,7 @@ func until(src string, ch rune) (int, string) {
 		} else {
 			if r == ch {
 				if !esc {
-					return i, res.String()
+					return i + 1, res.String()
 				}
 			}
 			if esc {
@@ -59,7 +59,6 @@ func until(src string, ch rune) (int, string) {
 			}
 			res.WriteRune(r)
 		}
-
 	}
 	return len(src), res.String()
 }
