@@ -57,6 +57,21 @@ func TestRun(t *testing.T) {
 			cmd:    `s/foo/bar`,
 			output: "bar",
 		},
+		{
+			input:  "foo",
+			cmd:    `a/bar`,
+			output: "foobar",
+		},
+		{
+			input:  "foo",
+			cmd:    `i/bar`,
+			output: "barfoo",
+		},
+		{
+			input:  "foo",
+			cmd:    `d`,
+			output: "",
+		},
 	}
 
 	for i, tc := range testCases {

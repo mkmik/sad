@@ -15,7 +15,14 @@ type cmd interface {
 }
 
 func parse(src string) (cmd, error) {
+	if src[0] == 'd' {
+		return &del{}, nil
+	}
 	switch ch, del := src[0], src[1]; ch {
+	case 'a':
+		return &appe{until(src[2:], rune(del))}, nil
+	case 'i':
+		return &inse{until(src[2:], rune(del))}, nil
 	case 's':
 		reg := until(src[2:], rune(del))
 		rep := until(src[2+1+len(reg):], rune(del))
