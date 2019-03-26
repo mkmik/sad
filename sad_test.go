@@ -118,3 +118,38 @@ func TestRun(t *testing.T) {
 		})
 	}
 }
+
+func TestAddr(t *testing.T) {
+	testCases := []struct {
+		input string
+		addr  string
+		sel   string
+	}{
+		{
+			input: "foo bar",
+			addr:  `/foo/`,
+			sel:   "foo",
+		},
+		{
+			input: "foo bar",
+			addr:  `/f/,/b`,
+			sel:   "foo b",
+		},
+	}
+	for i, tc := range testCases {
+		t.Run(fmt.Sprint(i), func(t *testing.T) {
+			a, err := parseAddr(tc.addr)
+			if err != nil {
+				t.Fatalf("%+v", err)
+			}
+			sel, err := a.address([]byte(tc.input), dot{0, len(tc.input)})
+			if err != nil {
+				t.Fatalf("%+v", err)
+			}
+
+			if got, want := tc.input[sel.low:sel.hi], tc.sel; got != want {
+				t.Errorf("got: %q, want: %q", got, want)
+			}
+		})
+	}
+}
