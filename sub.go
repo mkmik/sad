@@ -23,6 +23,9 @@ func (s *sub) process(src []byte) ([]byte, error) {
 	}
 
 	match := reg.FindSubmatchIndex(src)
+	if len(match) == 0 {
+		return src, nil
+	}
 	dst := reg.Expand(nil, rep, src, match)
 
 	var res []byte

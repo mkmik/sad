@@ -13,6 +13,11 @@ func TestRun(t *testing.T) {
 		output string
 	}{
 		{
+			input:  "nope",
+			cmd:    `s/foo/bar/`,
+			output: "nope",
+		},
+		{
 			input:  "foo",
 			cmd:    `s/foo/bar/`,
 			output: "bar",
@@ -82,6 +87,21 @@ func TestRun(t *testing.T) {
 			// and preserve all escape sequences supported by golang's regexp
 			input: "f/	o",
 			cmd:    `s;/\t;o;`,
+			output: "foo",
+		},
+		{ // utf-8 separators
+			input:  "foo",
+			cmd:    `s⌘foo⌘bar⌘`,
+			output: "bar",
+		},
+		{
+			input:  "foo",
+			cmd:    `i/⌘`,
+			output: "⌘foo",
+		},
+		{
+			input:  "f⌘a",
+			cmd:    `s/⌘a/oo`,
 			output: "foo",
 		},
 	}

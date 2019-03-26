@@ -8,26 +8,35 @@ import (
 	"log"
 	"os"
 	"strings"
+	"unicode/utf8"
 )
 
 type cmd interface {
 	process(src []byte) ([]byte, error)
 }
 
+func runeAt(str string, i int) rune {
+	return []rune(str[i:])[0]
+}
+
 func parse(src string) (cmd, error) {
 	if src[0] == 'd' {
 		return &del{}, nil
 	}
-	switch ch, del, rest := src[0], src[1], src[2:]; ch {
+
+	ch, term := src[0], runeAt(src, 1)
+	rest := src[1+utf8.RuneLen(term):]
+
+	switch ch {
 	case 'a':
-		_, body := until(rest, rune(del))
+		_, body := until(rest, term)
 		return &appe{body}, nil
 	case 'i':
-		_, body := until(rest, rune(del))
+		_, body := until(rest, term)
 		return &inse{body}, nil
 	case 's':
-		a, reg := until(rest, rune(del))
-		b, rep := until(rest[a:], rune(del))
+		a, reg := until(rest, term)
+		b, rep := until(rest[a:], term)
 		g := false
 		if i := a + b; len(rest) > i {
 			g = rest[i] == 'g'
@@ -50,7 +59,7 @@ func until(src string, ch rune) (int, string) {
 		} else {
 			if r == ch {
 				if !esc {
-					return i + 1, res.String()
+					return i + utf8.RuneLen(r), res.String()
 				}
 			}
 			if esc {
