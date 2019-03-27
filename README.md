@@ -1,4 +1,4 @@
-Sad is a poor man's sam's sed.
+Sad is a poor man's ssam.
 
 ----
 
